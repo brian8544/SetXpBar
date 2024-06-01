@@ -6,3 +6,5 @@ I’ve created an addon for *AzerothCore’s Individual XP Module* that allows p
 *Players can skip step one.*
 1) Clone [this module](https://github.com/azerothcore/mod-individual-xp) & follow the instructions listed on that repository.
 2) Apply this addon into your World of Warcraft folder.
+
+![GIF](https://i.imgur.com/gctjFVh.gif)
