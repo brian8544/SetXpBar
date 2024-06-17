@@ -1,7 +1,7 @@
-## Interface: 30300
+## Interface: 11402
 ## Title: SetXpBar
-## Notes: An addon that enables players to control their experience gain rate by right-clicking their XP bar. This feature requires the realm to have the mod-individual-xp module installed.
-## Author: brian8544, Rochet2, talamortis
+## Notes: An addon that enables players to control their experience gain rate by right-clicking their XP bar. This feature requires the realm to have the dynamic XP patch installed.
+## Author: brian8544, killerwife, Rochet2, talamortis
 ## Version: 1.0
 SetXpBar.lua
 SetXpBar.xml
