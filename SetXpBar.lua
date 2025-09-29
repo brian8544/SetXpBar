@@ -4,38 +4,56 @@ local function SetXpRate(rate)
     SendChatMessage(".xp set " .. rate, "SAY")
 end
 
--- List of XP rates with corresponding functions
-local xpRates = {
-    { text = "Experience:", isTitle = true },
-    { text = "x1 (Blizzlike)", func = function() SetXpRate(1) end },
-    { text = "x3", func = function() SetXpRate(3) end },
-    { text = "x5", func = function() SetXpRate(5) end },
-    { text = "x7", func = function() SetXpRate(7) end },
-    { text = "x12", func = function() SetXpRate(12) end },
-    { text = "Custom", func = function() StaticPopup_Show("SET_XP_RATE") end }, -- Open custom XP rate dialog
-}
+-- Dropdown menu setup
+local function InitializeMenu()
+    local info
 
--- Function to initialize the dropdown menu
-local function InitializeMenu(self, level)
-    if not level then return end
-    for _, rate in pairs(xpRates) do
-        local info = UIDropDownMenu_CreateInfo()
-        info.text = rate.text
-        info.func = rate.func
-        info.isTitle = rate.isTitle
-        UIDropDownMenu_AddButton(info, level)
-    end
+    info = {}
+    info.text = "Experience:"
+    info.isTitle = 1
+    info.notCheckable = 1
+    UIDropDownMenu_AddButton(info)
+
+    info = {}
+    info.text = "x1 (Blizzlike)"
+    info.func = function() SetXpRate(1) end
+    UIDropDownMenu_AddButton(info)
+
+    info = {}
+    info.text = "x3"
+    info.func = function() SetXpRate(3) end
+    UIDropDownMenu_AddButton(info)
+
+    info = {}
+    info.text = "x5"
+    info.func = function() SetXpRate(5) end
+    UIDropDownMenu_AddButton(info)
+
+    info = {}
+    info.text = "x7"
+    info.func = function() SetXpRate(7) end
+    UIDropDownMenu_AddButton(info)
+
+    info = {}
+    info.text = "x12"
+    info.func = function() SetXpRate(12) end
+    UIDropDownMenu_AddButton(info)
+
+    info = {}
+    info.text = "Custom"
+    info.func = function() StaticPopup_Show("SET_XP_RATE") end
+    UIDropDownMenu_AddButton(info)
 end
 
 -- Create the dropdown menu frame
 local xpBarMenu = CreateFrame("Frame", "SetXpBarMenu", UIParent, "UIDropDownMenuTemplate")
-xpBarMenu.initialize = InitializeMenu
+UIDropDownMenu_Initialize(xpBarMenu, InitializeMenu)
 
 -- Enable mouse interaction with the XP bar
 MainMenuExpBar:EnableMouse(true)
-MainMenuExpBar:SetScript("OnMouseDown", function(self, button)
-    if button == "RightButton" then
-        EasyMenu(xpRates, xpBarMenu, "cursor", 3, -3, "MENU")
+MainMenuExpBar:SetScript("OnMouseDown", function()
+    if arg1 == "RightButton" then
+        ToggleDropDownMenu(1, nil, xpBarMenu, "cursor", 0, 0)
     end
 end)
 
@@ -44,14 +62,36 @@ StaticPopupDialogs["SET_XP_RATE"] = {
     text = "Enter custom XP rate:",
     button1 = "Set Rate",
     button2 = "Cancel",
-    hasEditBox = true, -- Dialog has an edit box for user input
-    -- Function to execute when the "Set Rate" button is clicked
-    OnAccept = function(self)
-        local rate = self.editBox:GetText()
-        SetXpRate(rate)
+    hasEditBox = 1,
+    maxLetters = 10,
+
+    OnAccept = function()
+        local editBox = getglobal(this:GetParent():GetName().."EditBox")
+        local rate = editBox:GetText()
+        if rate and rate ~= "" then
+            SetXpRate(rate)
+        end
     end,
+
+    OnShow = function()
+        getglobal(this:GetName().."EditBox"):SetFocus()
+    end,
+
+    EditBoxOnEnterPressed = function()
+        local parent = this:GetParent()
+        local rate = this:GetText()
+        if rate and rate ~= "" then
+            SetXpRate(rate)
+        end
+        parent:Hide()
+    end,
+
+    EditBoxOnEscapePressed = function()
+        this:GetParent():Hide()
+    end,
+
     timeout = 0,
-    whileDead = true, -- Dialog persists even when other windows are open
-    hideOnEscape = true, -- Dialog closes when the escape key is pressed
-    preferredIndex = 3, -- Index to avoid taint from UIParent
+    whileDead = 1,
+    hideOnEscape = 1,
+    exclusive = 1,
 }
